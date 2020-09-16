@@ -1,0 +1,34 @@
+package com.jianbing.sunnyweather.logic.network
+
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.await
+import java.lang.RuntimeException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
+
+object SunnyWeatherNetwork {
+    private val placeService=ServiceCreater.creat(PlaceService::class.java)
+
+    suspend fun searchPlaces(query:String)= placeService.searchPlace(query).await()
+    private suspend fun <T>Call<T>.await():T{//拓展函数
+        return suspendCoroutine {continuaton->
+            enqueue(object : Callback<T> {//object有什么用，起什么作用   匿名内部类
+                override fun onResponse(call: Call<T>, response: Response<T>) {
+                    val body=response.body()
+                    if(body!=null)continuaton.resume(body)
+                    else continuaton.resumeWithException(
+                        RuntimeException("response body is null")
+                    )
+                }
+
+                override fun onFailure(call: Call<T>, t: Throwable) {
+                    continuaton.resumeWithException(t)
+                }
+
+            })
+        }
+    }
+}
