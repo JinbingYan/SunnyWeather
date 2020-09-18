@@ -34,7 +34,6 @@ class PlaceFragment:Fragment() {
         adapter= PlaceAdapter(this,viewModel.placeList)
         recycleView.adapter=adapter
         searchPlaceEdit.addTextChangedListener{editable->
-            print(".....")
             val content=editable.toString()
             if (content.isNotEmpty()){
                 viewModel.searchPlaces(content)
