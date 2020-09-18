@@ -8,15 +8,15 @@ import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.jianbing.sunnyweather.R
+import com.jianbing.sunnyweather.SunnyWeatherApplication
 import kotlinx.android.synthetic.main.fragement_place.*
 
 class PlaceFragment:Fragment() {
-    val viewModel by lazy { ViewModelProviders.of(this).get(PlaceViewModel::class.java) }
-
+    val viewModel by lazy { ViewModelProvider.NewInstanceFactory().create(PlaceViewModel::class.java) }
     private lateinit var adapter: PlaceAdapter
 
     override fun onCreateView(
@@ -31,8 +31,10 @@ class PlaceFragment:Fragment() {
         super.onActivityCreated(savedInstanceState)
         val layoutManager=LinearLayoutManager(activity)
         recycleView.layoutManager=layoutManager
-        recycleView.adapter=PlaceAdapter(this,viewModel.placeList)
+        adapter= PlaceAdapter(this,viewModel.placeList)
+        recycleView.adapter=adapter
         searchPlaceEdit.addTextChangedListener{editable->
+            print(".....")
             val content=editable.toString()
             if (content.isNotEmpty()){
                 viewModel.searchPlaces(content)
@@ -52,7 +54,7 @@ class PlaceFragment:Fragment() {
                 viewModel.placeList.addAll(places)
                 adapter.notifyDataSetChanged()
             }else{
-                Toast.makeText(activity,"未查询到任何地点",Toast.LENGTH_SHORT)
+                Toast.makeText(activity,"未查询到任何地点",Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
         })
